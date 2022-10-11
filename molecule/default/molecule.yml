@@ -3,13 +3,21 @@ dependency:
   name: galaxy
 
 driver:
-  name: delegated
+  name: docker
 
 platforms:
   - name: instance
+    image: debian:bullseye
+    dockerfile: Dockerfile.j2
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    override_command: false
 
 provisioner:
   name: ansible
+  env:
+    ANSIBLE_FORCE_COLOR: true
+    ANSIBLE_PIPELINING: true
 
 verifier:
   name: ansible

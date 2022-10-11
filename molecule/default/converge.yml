@@ -4,4 +4,4 @@
   tasks:
     - name: Include funkwhale
       ansible.builtin.include_role:
-        name: funkwhale
+        name: ansible-role-funkwhale
