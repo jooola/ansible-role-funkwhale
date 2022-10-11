@@ -32,3 +32,11 @@ repos:
     hooks:
       - id: codespell
         args: [--ignore-words=.codespellignore]
+
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v6.8.1
+    hooks:
+      - id: ansible-lint
+        name: ansible-lint
+        additional_dependencies:
+          - -rrequirements.txt
