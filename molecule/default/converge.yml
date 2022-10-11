@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Include funkwhale
+      include_role:
+        name: funkwhale
