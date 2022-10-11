@@ -1,2 +1,3 @@
 ---
-# tasks file for funkwhale
+- name: Include distribution specific vars
+  ansible.builtin.include_vars: "{{ ansible_distribution_release }}.yml"
