@@ -1,0 +1,7 @@
+## Ansible
+ansible-core>=2.13,<2.14
+ansible-lint>=6.0.0,<7.0
+
+## Dev
+molecule
+molecule-docker
