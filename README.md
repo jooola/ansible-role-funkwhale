@@ -1,6 +1,6 @@
-# Role Name
+# ansible-role-funkwhale
 
-A brief description of the role goes here.
+An ansible role to install [Funkwhale](https://funkwhale.audio).
 
 ## Requirements
 
@@ -26,8 +26,8 @@ Including an example of how to use your role (for instance, with variables passe
 
 ## License
 
-BSD
+See [LICENSE](./LICENSE)
 
 ## Author Information
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Contact us at https://funkwhale.audio/community/
