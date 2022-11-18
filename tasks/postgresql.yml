@@ -1,0 +1,47 @@
+---
+- name: Install postgresql package
+  ansible.builtin.apt:
+    name: [postgresql, postgresql-client, python3-psycopg2]
+
+- name: Start and enable postgresql systemd service
+  ansible.builtin.systemd:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Setup database
+  become: true
+  become_user: postgres
+  block:
+    - name: Create postgresql database user
+      community.postgresql.postgresql_user:
+        name: "{{ funkwhale_postgresql_user }}"
+        password: "{{ funkwhale_postgresql_password }}"
+
+    - name: Create postgresql database
+      community.postgresql.postgresql_db:
+        name: "{{ funkwhale_postgresql_name }}"
+        encoding: UTF-8
+        template: template0
+        owner: "{{ funkwhale_postgresql_user }}"
+
+    - name: Configure postgresql extensions
+      community.postgresql.postgresql_ext:
+        db: "{{ funkwhale_postgresql_name }}"
+        name: "{{ item }}"
+      with_items: [unaccent, citext]
+
+- name: Set funkwhale_postgresql_url
+  when: >
+    funkwhale_postgresql_url is undefined
+    or not funkwhale_postgresql_url
+  ansible.builtin.set_fact:
+    funkwhale_postgresql_url: >
+      {{
+        'postgresql:' +
+        '//' + funkwhale_postgresql_user +
+        ':'  + funkwhale_postgresql_password +
+        '@'  + funkwhale_postgresql_host +
+        ':'  + (funkwhale_postgresql_port | string) +
+        '/'  + funkwhale_postgresql_name
+      }}

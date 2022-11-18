@@ -1,0 +1,20 @@
+---
+- name: Install apt dependencies
+  ansible.builtin.apt:
+    state: present
+    name: [apt-transport-https, ca-certificates, gpg, curl]
+
+- name: Deploy apt source key for nodejs # noqa command-instead-of-module risky-shell-pipe
+  ansible.builtin.shell: >
+    curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    | gpg --dearmor -o /usr/share/keyrings/nodejs-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/nodejs-archive-keyring.gpg
+
+- name: Deploy apt source for nodejs
+  ansible.builtin.template:
+    src: nodejs/nodejs.sources.j2
+    dest: /etc/apt/sources.list.d/nodejs.sources
+    owner: root
+    group: root
+    mode: 0644

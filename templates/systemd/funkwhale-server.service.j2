@@ -1,0 +1,31 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Funkwhale application server service
+PartOf={{ funkwhale_instance_id }}.target
+After=network.target
+
+[Service]
+Type=notify
+KillMode=mixed
+PrivateTmp=true
+
+WorkingDirectory={{ funkwhale_install_dir }}
+EnvironmentFile={{ funkwhale_config_dir }}/.env
+
+ExecStart={{ funkwhale_venv_dir }}/bin/gunicorn \
+    config.asgi:application \
+    --workers=${FUNKWHALE_WEB_WORKERS} \
+    --worker-class=uvicorn.workers.UvicornWorker \
+    --bind=${FUNKWHALE_API_IP}:${FUNKWHALE_API_PORT}
+
+ExecReload=/bin/kill -s HUP $MAINPID
+
+Restart=on-failure
+RestartSec=10
+
+User={{ funkwhale_user }}
+Group={{ funkwhale_user }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Renew Certbot certificates
+
+[Service]
+Type=oneshot
+ExecStart={{ funkwhale_letsencrypt_venv_dir }}/bin/certbot renew --quiet

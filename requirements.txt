@@ -4,4 +4,4 @@ ansible-lint>=6.0.0,<7.0
 
 ## Dev
 molecule
-molecule-docker
+molecule-podman @ git+https://github.com/ansible-community/molecule-podman#8ad7dbf82f7176a5cf42d2ee50bd6eacae400f50

@@ -1,2 +1,99 @@
 ---
-# defaults file for funkwhale
+# Funkwhale Public url
+funkwhale_protocol: http
+funkwhale_hostname: localhost
+
+# Installation
+funkwhale_user: funkwhale
+funkwhale_instance_id: funkwhale
+funkwhale_version: 1.2.8
+
+# Configuration
+funkwhale_settings_module: config.settings.production
+funkwhale_env_extra_vars: []
+
+funkwhale_external_storage_enabled: false
+funkwhale_django_admin_enabled: false
+
+# Paths
+funkwhale_install_dir: "/opt/{{ funkwhale_instance_id }}"
+funkwhale_config_dir: "{{ funkwhale_install_dir }}/config"
+funkwhale_venv_dir: "{{ funkwhale_install_dir }}/venv"
+
+funkwhale_static_dir: "{{ funkwhale_install_dir }}/static"
+funkwhale_front_dir: "{{ funkwhale_install_dir }}/front/dist"
+
+funkwhale_data_dir: "/srv/{{ funkwhale_instance_id }}"
+funkwhale_media_dir: "{{ funkwhale_data_dir }}/media"
+funkwhale_music_dir: "{{ funkwhale_data_dir }}/music"
+
+funkwhale_source_dir: /src/{{ funkwhale_instance_id }}
+funkwhale_source_url: "{{ __funkwhale_repo_url }}"
+
+# Python
+funkwhale_pip_extra_packages: []
+
+# Systemd
+###############################################################################
+funkwhale_systemd_managed: true
+
+# Postgresql
+###############################################################################
+funkwhale_postgresql_managed: true
+# funkwhale_postgresql_url:
+
+funkwhale_postgresql_host: localhost
+funkwhale_postgresql_port: 5432
+funkwhale_postgresql_name: funkwhale
+funkwhale_postgresql_user: funkwhale
+funkwhale_postgresql_password: funkwhale
+
+# Redis
+###############################################################################
+funkwhale_redis_managed: true
+funkwhale_redis_url: redis://127.0.0.1:6379/0
+
+# Gunicorn
+###############################################################################
+funkwhale_gunicorn_listen_ip: 127.0.0.1
+funkwhale_gunicorn_listen_port: 5000
+funkwhale_gunicorn_workers: 1
+funkwhale_gunicorn_extra_args:
+
+# Nginx
+###############################################################################
+funkwhale_nginx_managed: true
+funkwhale_nginx_listen_port: 80
+funkwhale_nginx_config_raw:
+
+funkwhale_nginx_max_body_size: 100M
+funkwhale_nginx_compression_enabled: true
+
+funkwhale_nginx_tls_enabled: false
+funkwhale_nginx_tls_listen_port: 443
+funkwhale_nginx_tls_cert_path: /etc/letsencrypt/live/{{ funkwhale_hostname }}/fullchain.pem
+funkwhale_nginx_tls_key_path: /etc/letsencrypt/live/{{ funkwhale_hostname }}/privkey.pem
+funkwhale_nginx_tls_config_raw:
+
+funkwhale_nginx_csp_policy: >-
+  default-src 'self';
+  script-src 'self';
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data:;
+  font-src 'self' data:;
+  object-src 'none';
+  media-src 'self' data:;
+
+# Letsencrypt
+###############################################################################
+funkwhale_letsencrypt_managed: false
+# funkwhale_letsencrypt_email: REQUIRED!
+
+funkwhale_letsencrypt_venv_dir: /opt/letsencrypt/venv
+funkwhale_letsencrypt_create_cert: true
+funkwhale_letsencrypt_create_cert_extra_args:
+
+# Nodejs
+###############################################################################
+# See https://github.com/nodesource/distributions/blob/master/README.md
+funkwhale_nodejs_version: 18

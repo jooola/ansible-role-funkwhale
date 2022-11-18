@@ -1,0 +1,28 @@
+---
+- name: Install nginx package
+  ansible.builtin.apt:
+    name: [nginx]
+
+- name: Start and enable nginx systemd service
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Setup letsencrypt
+  when: funkwhale_letsencrypt_managed
+  ansible.builtin.import_tasks: letsencrypt.yml
+
+- name: Deploy nginx files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - src: nginx/funkwhale_proxy.conf.j2
+      dest: /etc/nginx/funkwhale_proxy.conf
+    - src: nginx/funkwhale_vhost.conf.j2
+      dest: /etc/nginx/sites-enabled/{{ funkwhale_hostname }}.conf
+  notify: Reload nginx

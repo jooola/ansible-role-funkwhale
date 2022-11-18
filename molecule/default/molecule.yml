@@ -3,15 +3,18 @@ dependency:
   name: galaxy
 
 driver:
-  name: docker
+  name: podman
 
 platforms:
   - name: instance
-    image: debian:bullseye
+    image: ${MOLECULE_IMAGE:-debian:bullseye}
     dockerfile: Dockerfile.j2
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     override_command: false
+    systemd: always
+    published_ports:
+      - 8080:80
 
 provisioner:
   name: ansible
