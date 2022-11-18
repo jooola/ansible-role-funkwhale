@@ -1,0 +1,8 @@
+[Unit]
+Description=Funkwhale
+Wants={{ funkwhale_instance_id }}-beat.service
+Wants={{ funkwhale_instance_id }}-server.service
+Wants={{ funkwhale_instance_id }}-worker.service
+PropagatesReloadTo={{ funkwhale_instance_id }}-beat.service
+PropagatesReloadTo={{ funkwhale_instance_id }}-server.service
+PropagatesReloadTo={{ funkwhale_instance_id }}-worker.service

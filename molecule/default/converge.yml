@@ -5,3 +5,9 @@
     - name: Include funkwhale
       ansible.builtin.include_role:
         name: ansible-role-funkwhale
+      vars:
+        funkwhale_protocol: http
+        funkwhale_hostname: localhost
+        funkwhale_secret_key: some_generated_secret_key!
+
+        funkwhale_letsencrypt_managed: false

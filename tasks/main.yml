@@ -1,3 +1,33 @@
 ---
 - name: Include distribution specific vars
   ansible.builtin.include_vars: "{{ ansible_distribution_release }}.yml"
+
+- name: Install apt dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - make
+      - python3
+      - python3-pip
+      - python3-venv
+      - unzip
+    state: present
+
+- name: Setup redis
+  when: funkwhale_redis_managed
+  ansible.builtin.import_tasks: redis.yml
+
+- name: Setup postgresql
+  when: funkwhale_postgresql_managed
+  ansible.builtin.import_tasks: postgresql.yml
+
+- name: Setup funkwhale
+  ansible.builtin.import_tasks: funkwhale.yml
+
+- name: Setup systemd services
+  when: funkwhale_systemd_managed
+  ansible.builtin.import_tasks: systemd.yml
+
+- name: Setup nginx
+  when: funkwhale_nginx_managed
+  ansible.builtin.import_tasks: nginx.yml

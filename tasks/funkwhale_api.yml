@@ -1,0 +1,79 @@
+---
+- name: Download api artifact
+  ansible.builtin.unarchive:
+    src: "{{ __funkwhale_repo_url }}/builds/artifacts/{{ funkwhale_version }}/download?job=build_api"
+    dest: "{{ funkwhale_install_dir }}"
+    remote_src: true
+    owner: root
+    group: root
+    # Fix weird permissions in archive
+    # See https://dev.funkwhale.audio/funkwhale/funkwhale/-/commit/cac543c9ba84680c7e09d3cadd921c923e9fbe82
+    mode: u=rwX,g=rX,o=rX
+  notify: Reload funkwhale
+
+- name: Install api apt dependencies
+  ansible.builtin.apt:
+    name:
+      # Postgresql
+      - libpq-dev
+      # LDAP
+      - libldap2-dev
+      - libsasl2-dev
+      # Pydub / Audio processing
+      - ffmpeg
+      # Magic
+      - libmagic-dev
+    state: present
+
+- name: Create api python venv
+  ansible.builtin.pip:
+    name:
+      - pip
+      - setuptools
+      - wheel
+    virtualenv: "{{ funkwhale_venv_dir }}"
+    virtualenv_command: python3 -m venv
+  notify: Restart funkwhale
+
+- name: Install api python packages
+  ansible.builtin.pip:
+    requirements: "{{ funkwhale_install_dir }}/api/requirements.txt"
+    virtualenv: "{{ funkwhale_venv_dir }}"
+  notify: Restart funkwhale
+
+- name: Install gunicorn/uvicorn python packages
+  ansible.builtin.pip:
+    name:
+      - gunicorn
+      - uvicorn[standard]
+    virtualenv: "{{ funkwhale_venv_dir }}"
+  notify: Restart funkwhale
+
+- name: Install api extra python packages
+  when: funkwhale_pip_extra_packages
+  ansible.builtin.pip:
+    name: "{{ funkwhale_pip_extra_packages }}"
+    virtualenv: "{{ funkwhale_venv_dir }}"
+  notify: Restart funkwhale
+
+- name: Collect api static files
+  ansible.builtin.command: >
+    {{ funkwhale_venv_dir }}/bin/python3
+    {{ funkwhale_install_dir }}/api/manage.py collectstatic --no-input
+  args:
+    chdir: "{{ funkwhale_install_dir }}"
+  register: api_collect_static
+  changed_when: >
+    '0 static files copied to' not in api_collect_static.stdout
+
+- name: Apply database migrations
+  become: true
+  become_user: "{{ funkwhale_user }}"
+  ansible.builtin.command: >
+    {{ funkwhale_venv_dir }}/bin/python3
+    {{ funkwhale_install_dir }}/api/manage.py migrate --no-input
+  args:
+    chdir: "{{ funkwhale_install_dir }}"
+  register: api_migrate
+  changed_when: >
+    'No migrations to apply.' not in api_migrate.stdout

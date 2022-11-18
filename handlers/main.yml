@@ -1,2 +1,18 @@
 ---
-# handlers file for funkwhale
+- name: Restart funkwhale
+  when: funkwhale_systemd_managed
+  ansible.builtin.systemd:
+    name: "{{ funkwhale_instance_id }}.target"
+    state: restarted
+
+- name: Reload funkwhale
+  when: funkwhale_systemd_managed
+  ansible.builtin.systemd:
+    name: "{{ funkwhale_instance_id }}.target"
+    state: reloaded
+
+- name: Reload nginx
+  when: funkwhale_nginx_managed
+  ansible.builtin.systemd:
+    name: nginx
+    state: reloaded

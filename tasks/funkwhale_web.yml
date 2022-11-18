@@ -1,0 +1,12 @@
+---
+- name: Download web artifact
+  ansible.builtin.unarchive:
+    src: "{{ __funkwhale_repo_url }}/builds/artifacts/{{ funkwhale_version }}/download?job=build_front"
+    dest: "{{ funkwhale_install_dir }}"
+    remote_src: true
+    owner: root
+    group: root
+    # Fix weird permissions in archive
+    # See https://dev.funkwhale.audio/funkwhale/funkwhale/-/commit/cac543c9ba84680c7e09d3cadd921c923e9fbe82
+    mode: u=rwX,g=rX,o=rX
+  notify: Reload funkwhale

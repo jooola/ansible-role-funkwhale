@@ -4,7 +4,7 @@ stages:
 
 pre-commit:
   stage: test
-  image: python:latest
+  image: python:3.10
   variables:
     PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
     PRE_COMMIT_HOME: $CI_PROJECT_DIR/.cache/pre-commit
@@ -16,16 +16,3 @@ pre-commit:
     - pip3 install pre-commit
   script:
     - pre-commit run --all --color=always --show-diff-on-failure
-
-test:
-  stage: test
-  image: python:latest
-  variables:
-    PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
-  cache:
-    paths:
-      - $CI_PROJECT_DIR/.cache/pip
-  before_script:
-    - make install
-  script:
-    - make test

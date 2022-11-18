@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Funkwhale celery worker service
+PartOf={{ funkwhale_instance_id }}.target
+
+[Service]
+WorkingDirectory={{ funkwhale_install_dir }}
+EnvironmentFile={{ funkwhale_config_dir }}/.env
+
+ExecStart={{ funkwhale_venv_dir }}/bin/celery \
+    --app funkwhale_api.taskapp \
+    worker \
+    --loglevel INFO
+
+Restart=on-failure
+RestartSec=10
+
+User={{ funkwhale_user }}
+Group={{ funkwhale_user }}
+
+[Install]
+WantedBy=multi-user.target

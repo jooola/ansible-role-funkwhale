@@ -1,0 +1,46 @@
+---
+- name: Create funkwhale user
+  ansible.builtin.user:
+    name: "{{ funkwhale_user }}"
+    home: "{{ funkwhale_install_dir }}"
+    create_home: false
+    shell: /usr/sbin/nologin
+
+- name: Create funkwhale directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  with_items:
+    - "{{ funkwhale_install_dir }}"
+    - "{{ funkwhale_config_dir }}"
+    - "{{ funkwhale_static_dir }}"
+
+- name: Create funkwhale data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ funkwhale_user }}"
+    group: "{{ funkwhale_user }}"
+    mode: 0750
+    state: directory
+  with_items:
+    - "{{ funkwhale_data_dir }}"
+    - "{{ funkwhale_media_dir }}"
+    - "{{ funkwhale_music_dir }}"
+
+- name: Deploy funkwhale env configuration
+  ansible.builtin.template:
+    src: funkwhale/env.j2
+    dest: "{{ funkwhale_config_dir }}/.env"
+    owner: "{{ funkwhale_user }}"
+    group: "{{ funkwhale_user }}"
+    mode: 0600
+  notify: Restart funkwhale
+
+- name: Setup funkwhale api
+  ansible.builtin.import_tasks: funkwhale_api.yml
+
+- name: Setup funkwhale web
+  ansible.builtin.import_tasks: funkwhale_web.yml

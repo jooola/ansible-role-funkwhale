@@ -1,0 +1,49 @@
+---
+- name: Create letsencrypt venv directory
+  ansible.builtin.file:
+    path: "{{ funkwhale_letsencrypt_venv_dir }}"
+    owner: root
+    group: root
+    mode: 0750
+    state: directory
+
+- name: Install certbot apt dependencies
+  ansible.builtin.apt:
+    name: [python3, python3-venv]
+    state: present
+
+- name: Install certbot python packages
+  ansible.builtin.pip:
+    name: [certbot, certbot-nginx]
+    virtualenv: "{{ funkwhale_letsencrypt_venv_dir }}"
+    virtualenv_command: python3 -m venv
+
+- name: Create letsencrypt certificate
+  when: funkwhale_letsencrypt_create_cert
+  ansible.builtin.command: >
+    {{ funkwhale_letsencrypt_venv_dir }}/bin/certbot --verbose --non-interactive --test-cert
+      certonly
+      --nginx
+      -m {{ funkwhale_letsencrypt_email }}
+      --agree-tos
+      --domain {{ funkwhale_hostname }}
+      {{ funkwhale_letsencrypt_create_cert_extra_args }}
+  args:
+    creates: /etc/letsencrypt/live/{{ funkwhale_hostname }}
+
+- name: Deploy certbot systemd renew timer
+  ansible.builtin.template:
+    src: systemd/{{ item }}.j2
+    dest: /etc/systemd/system/{{ item.dest }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - certbot-renew.service
+    - certbot-renew.timer
+
+- name: Start and enable certbot systemd renew timer
+  ansible.builtin.systemd:
+    name: certbot-renew.timer
+    state: started
+    enabled: true
